@@ -21,17 +21,12 @@ make package/luci-app-run/compile V=s
 ## 安装方法
 ### Luci 25.12.x
 
+#### 先解锁 25.12.x OpenWrt 的安装功能（开关），然后在系统——软件包 上传安装apk
 ```sh
-wget -O luci-app-run.apk <替换为apk地址>
-apk update
-apk add --allow-untrusted luci-app-run.apk
+wget -O toggle.sh https://cafe.cpolar.cn/wkdaily/cool/raw/branch/master/apk-untrusted-toggle.sh && sh toggle.sh
+
 ```
 
 ### Luci 21——24.10 
+- 在系统——软件包 上传安装ipk
 
-```sh
-wget -O luci-app-run.ipk <替换为ipk地址>
-opkg update
-opkg install luci-app-run.ipk
-```
-- 或者在软件包 上传安装ipk
