@@ -9,7 +9,7 @@ LUCI_DESCRIPTION:=Upload and execute .run, .sh, .ipk and .apk files from LuCI.
 LUCI_DEPENDS:=+luci-base +rpcd +libubox
 LUCI_PKGARCH:=all
 
-PKG_MAINTAINER:=wukongdaily <2666180@gmail.com>
+PKG_MAINTAINER:=wukongdaily <wukongdaily@gmail.com>
 
 # 定义版本号用于缓存刷新
 define Package/luci-app-run/postinst
