@@ -37,8 +37,26 @@ function getLang() {
 		var m = document.cookie.match(/luci_lang=([a-zA-Z-]+)/);
 		if (m) return m[1].substring(0, 2).toLowerCase();
 
+		m = document.cookie.match(/LANG=([a-zA-Z_-]+)/);
+		if (m) return m[1].substring(0, 2).toLowerCase();
+
 		if (window.L && L.env && L.env.lang)
 			return L.env.lang.substring(0, 2).toLowerCase();
+
+		if (window.luci && luci.config && luci.config.lang)
+			return luci.config.lang.substring(0, 2).toLowerCase();
+
+		if (window.luci && luci.i18n && luci.i18n.lang)
+			return luci.i18n.lang.substring(0, 2).toLowerCase();
+
+		if (document.documentElement && document.documentElement.lang)
+			return document.documentElement.lang.substring(0, 2).toLowerCase();
+
+		if (navigator && navigator.language)
+			return navigator.language.substring(0, 2).toLowerCase();
+
+		if (navigator && navigator.userLanguage)
+			return navigator.userLanguage.substring(0, 2).toLowerCase();
 
 		return 'zh';
 	} catch (e) {
