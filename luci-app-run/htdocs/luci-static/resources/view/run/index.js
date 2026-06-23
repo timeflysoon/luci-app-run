@@ -3,6 +3,7 @@
 'require rpc';
 'require ui';
 'require poll';
+'require view/run/i18n.json';
 
 var I18N = require('view/run/i18n.json');
 
