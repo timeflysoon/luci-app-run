@@ -252,24 +252,22 @@ return view.extend({
 			}
 		}, [_('choose_apk')]);
 
-		var argsInput = E('input', {
-			type: 'text',
-			id: 'run-args',
-			placeholder: _('script_args'),
-			style: 'display:none;margin-left:15px;padding:6px 12px;border:1px solid #ccc;border-radius:4px;width:200px',
-		});
-
 		var runButton = E('button', {
 			class: 'cbi-button cbi-button-action run-btn',
 			disabled: true,
 			style: 'min-width:140px;margin-left:15px;background:#7B1FA2!important;background-color:#7B1FA2!important;background-image:none!important;color:#fff!important;border-color:#7B1FA2!important;box-shadow:none!important;text-shadow:none!important;opacity:1!important',
 			click: function (ev) {
 				ev.preventDefault();
-				var args = '';
+
 				if (self.currentFileType === '.sh') {
-					args = argsInput.value.trim();
+					self.showArgsDialog(function (args) {
+						if (args !== null) {
+							self.startRun(runButton, state, args.trim());
+						}
+					});
+				} else {
+					self.startRun(runButton, state, '');
 				}
-				self.startRun(runButton, state, args);
 			}
 		}, [_('execute')]);
 
@@ -419,23 +417,8 @@ return view.extend({
 
 				uploadFinish(session.id).then(function () {
 					state.textContent = _('upload_done', file.name, formatBytes(file.size));
-
-					// 显示或隐藏参数输入框
-					if (self.currentFileType === '.sh') {
-						argsInput.style.display = '';
-					} else {
-						argsInput.style.display = 'none';
-						argsInput.value = '';
-					}
 				}).catch(function () {
 					state.textContent = _('upload_done', file.name, formatBytes(file.size));
-
-					if (self.currentFileType === '.sh') {
-						argsInput.style.display = '';
-					} else {
-						argsInput.style.display = 'none';
-						argsInput.value = '';
-					}
 				});
 
 				resolve();
@@ -470,6 +453,47 @@ return view.extend({
 			runButton.disabled = false;
 			ui.addNotification(null, E('p', [err.message || err]), 'danger');
 		});
+	},
+
+	showArgsDialog: function (callback) {
+		var dialog = E('div', {
+			style: 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999'
+		}, [
+			E('div', {
+				style: 'background:#fff;border-radius:8px;padding:20px;width:400px;box-shadow:0 4px 20px rgba(0,0,0,0.3)'
+			}, [
+				E('input', {
+					type: 'text',
+					placeholder: _('script_args'),
+					style: 'width:100%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;font-size:14px',
+					id: 'run-args-dialog-input'
+				}),
+				E('div', {
+					style: 'display:flex;justify-content:flex-end;gap:10px'
+				}, [
+					E('button', {
+						class: 'cbi-button cbi-button-reset',
+						style: 'padding:8px 20px',
+						click: function () {
+							document.body.removeChild(dialog);
+							callback(null);
+						}
+					}, [_('cancel')]),
+					E('button', {
+						class: 'cbi-button cbi-button-action',
+						style: 'padding:8px 20px',
+						click: function () {
+							var args = document.getElementById('run-args-dialog-input').value;
+							document.body.removeChild(dialog);
+							callback(args);
+						}
+					}, [_('confirm')])
+				])
+			])
+		]);
+
+		document.body.appendChild(dialog);
+		document.getElementById('run-args-dialog-input').focus();
 	},
 
 	refreshLog: function (log, state) {
