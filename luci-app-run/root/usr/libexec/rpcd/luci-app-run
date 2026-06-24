@@ -98,7 +98,9 @@ is_running() {
     
     echo "$cmdline" | grep -q "luci-app-run" && return 0
     
-    echo "$cmdline" | grep -q "\.run\|\.sh" && return 0
+    echo "$cmdline" | grep -q "[^a-zA-Z0-9]\.run\(\s\|$\)" && return 0
+    
+    echo "$cmdline" | grep -q "[^a-zA-Z0-9]\.sh\(\s\|$\)" && return 0
     
     return 1
 }
