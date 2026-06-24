@@ -89,7 +89,18 @@ read_state() {
 
 is_running() {
     local pid="$1"
-    [ -n "$pid" ] && [ -d "/proc/$pid" ]
+    [ -n "$pid" ] || return 1
+    
+    [ -d "/proc/$pid" ] || return 1
+    
+    local cmdline
+    cmdline="$(cat "/proc/$pid/cmdline" 2>/dev/null | tr '\0' ' ')"
+    
+    echo "$cmdline" | grep -q "luci-app-run" && return 0
+    
+    echo "$cmdline" | grep -q "\.run\|\.sh" && return 0
+    
+    return 1
 }
 
 method_list() {
@@ -229,6 +240,11 @@ run_installer() {
     file="$dir/$name"
     
     read_state
+    if [ -n "$PID" ] && ! is_running "$PID"; then
+        rm -f "$STATE_FILE"
+        unset PID
+    fi
+    
     if is_running "$PID"; then
         json_error "Another installer is already running"
         return
