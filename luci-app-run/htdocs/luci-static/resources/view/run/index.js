@@ -48,15 +48,50 @@ function getLang() {
 
 function _(key) {
 	if (!I18N)
-		return key;
+		return getDefaultText(key);
 
 	var lang = getLang();
-	var str = (I18N[lang] && I18N[lang][key]) || (I18N.zh && I18N.zh[key]) || key;
+	var str = (I18N[lang] && I18N[lang][key]) || (I18N.zh && I18N.zh[key]) || getDefaultText(key) || key;
 	var args = Array.prototype.slice.call(arguments, 1);
 	if (args.length > 0) {
 		return str.format.apply(str, args);
 	}
 	return str;
+}
+
+function getDefaultText(key) {
+	var defaults = {
+		'title': 'Run安装器',
+		'desc': '在路由器上上传并执行脚本或安装包，注意架构务必匹配。',
+		'drop_tip': '拖入文件，或从电脑选择。',
+		'choose_file': '选择 .run 或 .sh 文件',
+		'choose_ipk': '选择 .ipk 包',
+		'choose_apk': '选择 .apk 包',
+		'execute': '执行',
+		'clean_up': '清理',
+		'upload_title': '上传文件',
+		'log_title': '执行日志',
+		'clean_done': '临时文件与日志已清理。',
+		'only_supported': '仅支持 .run、.sh、.ipk 和 .apk 文件。',
+		'prepare_upload': '准备上传：%s (%s)',
+		'upload_failed': '上传失败。',
+		'uploading': '正在上传 %s：%d%%',
+		'upload_err': '上传请求失败。',
+		'upload_invalid': '上传返回格式无效。',
+		'upload_done': '上传完成：%s (%s)',
+		'starting': '正在启动安装器...',
+		'started': '安装器已启动，PID %d。',
+		'running': '安装器正在运行。',
+		'last_file': '上一次安装包：%s',
+		'err_no_opkg': '您的系统不支持 ipk 包安装，请选择 apk 包。',
+		'err_no_apk': '您的系统不支持 apk 包安装，请选择 ipk 包。',
+		'script_args': '脚本参数（如 -q -h）',
+		'args_hint': '您可以输入脚本参数或留空',
+		'cancel': '取消',
+		'confirm': '确定',
+		'auto_cleaned': '执行完毕，已自动清理临时文件。'
+	};
+	return defaults[key] || null;
 }
 
 var uploadStart = rpc.declare({
@@ -531,8 +566,6 @@ return view.extend({
 					self.autoCleanType = null;
 					cleanup().then(function () {
 						self.currentUploadId = null;
-						self.logOffset = 0;
-						log.textContent = '';
 						state.textContent = _('auto_cleaned');
 					}).catch(function () {
 						state.textContent = _('clean_done');
