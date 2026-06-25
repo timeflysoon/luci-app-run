@@ -249,9 +249,10 @@ download_run() {
     
     local filename id dir file log work pid now
     
-    filename="$(echo "$url" | sed 's|^https\?://[^/]*//|https://|')"
-    filename="$(basename "$filename")"
-    filename="$(echo "$filename" | sed 's|\?.*$||')"
+    # Extract filename from URL - get everything after the last /
+    filename="${url##*/}"
+    # Remove query parameters if any
+    filename="${filename%%\?*}"
     
     case "$filename" in
         *.run) ;;
