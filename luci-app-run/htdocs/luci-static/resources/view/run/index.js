@@ -452,7 +452,6 @@ return view.extend({
 		}, 100);
 
 		poll.add(function () {
-			cleanupStaleDialogs();
 			return self.refreshLog(log, state);
 		}, 1);
 
