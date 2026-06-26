@@ -317,21 +317,24 @@ return view.extend({
 
 		var runButton = E('button', {
 			class: 'cbi-button cbi-button-action run-btn',
-			style: 'min-width:140px;margin-left:15px;background:#7B1FA2!important;background-color:#7B1FA2!important;background-image:none!important;color:#fff!important;border-color:#7B1FA2!important;box-shadow:none!important;text-shadow:none!important;opacity:1!important',
+			disabled: false,
+			style: 'min-width:140px;margin-left:15px;background:#7B1FA2!important;background-color:#7B1FA2!important;background-image:none!important;color:#fff!important;border-color:#7B1FA2!important;box-shadow:none!important;text-shadow:none!important;opacity:1!important;pointer-events:auto!important;cursor:pointer!important',
 			click: function (ev) {
 				ev.preventDefault();
+				ev.stopPropagation();
+
+				log.textContent = '';
 
 				if (self.currentFileType === '.sh') {
 					self.showArgsDialog(function (args) {
 						if (args !== null) {
-							log.textContent = '';
 							self.startRun(runButton, state, args.trim());
 						}
 					});
 				} else {
-					log.textContent = '';
 					self.startRun(runButton, state, '');
 				}
+				return false;
 			}
 		}, [_('execute')]);
 
@@ -398,6 +401,13 @@ return view.extend({
 			if (apkInput.files && apkInput.files.length)
 				self.uploadFile(apkInput.files[0], progress, state, runButton);
 		});
+
+		setTimeout(function () {
+			runButton.disabled = false;
+			runButton.removeAttribute('disabled');
+			runButton.style.pointerEvents = 'auto';
+			runButton.style.cursor = 'pointer';
+		}, 100);
 
 		poll.add(function () {
 			return self.refreshLog(log, state);
