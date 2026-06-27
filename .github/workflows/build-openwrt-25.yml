@@ -11,22 +11,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: x86/64
-            platform: x86-64
-            arch: x86-64
-
-          - target: rockchip/armv8
-            platform: rockchip-armv8
-            arch: aarch64_cortex-a53
-
-          - target: armsr/armv8
-            platform: armsr-armv8
-            arch: aarch64_generic
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -45,8 +29,8 @@ jobs:
       # =========================
       - name: Download OpenWrt SDK
         run: |
-          SDK="openwrt-sdk-${OPENWRT_VER}-${{ matrix.platform }}_gcc-${GCC_VER}_musl.Linux-x86_64.tar.zst"
-          URL="https://downloads.openwrt.org/releases/${OPENWRT_VER}/targets/${{ matrix.target }}/$SDK"
+          SDK="openwrt-sdk-${OPENWRT_VER}-x86-64_gcc-${GCC_VER}_musl.Linux-x86_64.tar.zst"
+          URL="https://downloads.openwrt.org/releases/${OPENWRT_VER}/targets/x86/64/$SDK"
 
           echo "Downloading:"
           echo "$URL"
@@ -84,8 +68,7 @@ jobs:
         run: |
           mkdir -p dist
           find sdk/bin -type f -name "luci-app-run*.apk" -print0 | while IFS= read -r -d '' file; do
-            base=$(basename "$file" .apk)
-            cp -v "$file" "dist/${base}-${{ matrix.arch }}.apk"
+            cp -v "$file" dist/
           done
 
       # =========================
@@ -94,7 +77,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: luci-app-run-${{ matrix.arch }}
+          name: luci-app-run-noarch
           path: dist/
 
   release:
